@@ -1,0 +1,35 @@
+# ============================================================================
+# GuitarKOR (Гитар КОР) — зависимости окружения разработки/сборки.
+# Целевая версия Python: 3.11 x64 (несколько аудио-пакетов не имеют свежих
+# wheels для более новых версий Python на Windows — см. раздел 1 мастер-промпта).
+# Установка:  python -m pip install -r requirements.txt
+# Полный lock с хешами: tools/freeze_lock.py -> requirements.lock.txt (VERIFY при релизе)
+# ============================================================================
+
+# Ядро DSP / анализ (все — пермиссивные или LGPL-совместимые с GPL-3 сборкой)
+numpy>=1.26,<2.4
+scipy>=1.11
+soundfile>=0.12          # LGPL (libsndfile)
+librosa>=0.10            # ISC
+audioread>=3.0           # MP3/прочие декодеры через backend (GStreamer/ffmpeg)
+
+# UI
+PySide6>=6.6             # LGPL-3.0
+
+# MIDI / экспорт
+mido>=1.3                # MIT
+
+# Опционально (раскомментируйте по фазам; лицензионные оговорки в THIRD_PARTY_LICENSES.md):
+# onnxruntime>=1.16              # фаза 3, MIT. НЕ совмещать в одном окружении с
+# onnxruntime-directml>=1.16     #   onnxruntime-gpu / -directml (mutually exclusive)
+# sounddevice>=0.4               # фаза 6, MIT (PortAudio; ASIO отсутствует в стоковом wheel — VERIFY)
+# pedalboard>=0.9                # фаза 7, GPLv3 + отдельный license key для VST-хостинга (VERIFY)
+# pyguitarpro>=5.0               # фаза 5, GPL/LGPL (VERIFY актуальный пакет)
+# music21>=9.0                   # фаза 5, BSD-3
+# madmom>=0.17                   # OFF by default: веса CC BY-NC-SA (некоммерческое использование)
+# essentia>=2.1b                 # AGPL-3.0 (VERIFY wheels для Windows/Py3.11)
+
+# Разработка и тесты
+pytest>=7.4
+pytest-qt>=4.2
+mir_eval>=0.7            # ISC — метрики WCSR для tools/evaluate_chords.py
