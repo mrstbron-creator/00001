@@ -1,1 +1,323 @@
 @import "tailwindcss";
+
+@theme {
+  --color-bg-primary: #0b0a0e;
+  --color-bg-panel: #16141c;
+  --color-bg-card: #1e1b27;
+  --color-border-subtle: #2a2433;
+  --color-accent-red: #ff2d1a;
+  --color-accent-orange: #ff7a1a;
+  --color-accent-blue: #4aa3ff;
+  --color-accent-green: #3ecf8e;
+  --color-accent-yellow: #f5c518;
+  --color-text-primary: #f0ecf5;
+  --color-text-muted: #8a8296;
+  --color-text-dim: #5a5466;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0b0a0e;
+  color: #f0ecf5;
+  overflow: hidden;
+  background-image: 
+    radial-gradient(ellipse at 20% 50%, rgba(255,45,26,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(255,122,26,0.02) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(74,163,255,0.02) 0%, transparent 50%);
+}
+
+/* Noise texture overlay */
+.noise-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  z-index: 9999;
+}
+
+/* Vignette */
+.vignette {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+  z-index: 9998;
+}
+
+/* Metal button */
+.btn-metal {
+  background: linear-gradient(180deg, #2a2433 0%, #1a1622 100%);
+  border: 1px solid #3a3445;
+  border-bottom: 2px solid #0a0810;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 2px 4px rgba(0,0,0,0.5);
+  transition: all 0.1s ease;
+  cursor: pointer;
+  color: #f0ecf5;
+}
+
+.btn-metal:hover {
+  background: linear-gradient(180deg, #3a3445 0%, #2a2433 100%);
+}
+
+.btn-metal:active {
+  transform: translateY(1px);
+  border-bottom: 1px solid #0a0810;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* Accent button (play, record) */
+.btn-accent {
+  background: linear-gradient(135deg, #ff2d1a 0%, #ff7a1a 100%);
+  border: 1px solid #ff5a2a;
+  box-shadow: 0 0 15px rgba(255,45,26,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: all 0.15s ease;
+  cursor: pointer;
+  color: white;
+  font-weight: 700;
+}
+
+.btn-accent:hover {
+  box-shadow: 0 0 25px rgba(255,45,26,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.btn-accent:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 10px rgba(255,45,26,0.3);
+}
+
+/* Glow pulse animation */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(255,45,26,0.4); }
+  50% { box-shadow: 0 0 25px rgba(255,45,26,0.8), 0 0 50px rgba(255,45,26,0.3); }
+}
+
+.glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes rec-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.rec-blink {
+  animation: rec-blink 1s ease-in-out infinite;
+}
+
+/* VU Meter */
+@keyframes vu-bounce {
+  0%, 100% { height: 20%; }
+  50% { height: 80%; }
+}
+
+/* Title bar skew */
+.title-skew {
+  transform: skewX(-3deg);
+  text-shadow: 0 0 20px rgba(255,45,26,0.6), 0 0 40px rgba(255,45,26,0.3);
+}
+
+/* Chord tile */
+.chord-tile {
+  background: linear-gradient(135deg, #1e1b27 0%, #16141c 100%);
+  border: 1px solid #2a2433;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.15s ease;
+}
+
+.chord-tile::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 12px; height: 12px;
+  background: linear-gradient(135deg, transparent 50%, #0b0a0e 50%);
+}
+
+.chord-tile.active {
+  border-color: #ff2d1a;
+  box-shadow: 0 0 15px rgba(255,45,26,0.3);
+}
+
+/* Confidence bar */
+.confidence-high { background: linear-gradient(90deg, #3ecf8e, #2ea86e); }
+.confidence-mid { background: linear-gradient(90deg, #f5c518, #e5a500); }
+.confidence-low { background: linear-gradient(90deg, #ff2d1a, #cc1a0a); }
+
+/* Slider (potentiometer style) */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: #1a1622;
+  border-radius: 3px;
+  border: 1px solid #2a2433;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff2d1a, #ff7a1a);
+  border: 2px solid #ff5a2a;
+  box-shadow: 0 0 8px rgba(255,45,26,0.4);
+  cursor: pointer;
+}
+
+/* Guitar neck */
+.guitar-neck {
+  background: linear-gradient(180deg, #3d2b1a 0%, #2a1d10 50%, #3d2b1a 100%);
+  border: 2px solid #1a1208;
+  border-radius: 4px;
+}
+
+.guitar-string {
+  background: linear-gradient(90deg, #888 0%, #ccc 50%, #888 100%);
+  height: 1px;
+}
+
+.guitar-string:nth-child(1) { height: 0.5px; }
+.guitar-string:nth-child(2) { height: 0.7px; }
+.guitar-string:nth-child(3) { height: 1px; }
+.guitar-string:nth-child(4) { height: 1.3px; }
+.guitar-string:nth-child(5) { height: 1.6px; }
+.guitar-string:nth-child(6) { height: 2px; }
+
+/* Fret */
+.fret {
+  width: 1px;
+  background: linear-gradient(180deg, #aaa 0%, #ddd 50%, #aaa 100%);
+}
+
+/* Inlay */
+.inlay {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f5f0e8 0%, #ccc 100%);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b0a0e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2433;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3445;
+}
+
+/* Tab active */
+.tab-active {
+  background: linear-gradient(180deg, #ff2d1a22 0%, transparent 100%);
+  border-bottom: 2px solid #ff2d1a;
+  color: #ff7a1a;
+}
+
+/* Waveform */
+.waveform-bar {
+  background: linear-gradient(180deg, #4aa3ff 0%, #2a6acc 100%);
+  border-radius: 1px;
+}
+
+/* Panel card */
+.panel {
+  background: #16141c;
+  border: 1px solid #2a2433;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02), 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* Mono font for chords */
+.font-chord {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Smooth transitions */
+.transition-smooth {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Knob rotation */
+@keyframes knob-rotate {
+  from { transform: rotate(-135deg); }
+  to { transform: rotate(135deg); }
+}
+
+/* Splash screen */
+@keyframes splash-fade {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; pointer-events: none; }
+}
+
+.splash-screen {
+  animation: splash-fade 3s ease-in-out forwards;
+}
+
+@keyframes splash-glow {
+  0%, 100% { text-shadow: 0 0 20px rgba(255,45,26,0.6), 0 0 40px rgba(255,45,26,0.3); }
+  50% { text-shadow: 0 0 40px rgba(255,45,26,0.9), 0 0 80px rgba(255,45,26,0.5), 0 0 120px rgba(255,122,26,0.3); }
+}
+
+.splash-glow {
+  animation: splash-glow 2s ease-in-out infinite;
+}
+
+/* Needle tremble */
+@keyframes needle-tremble {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-0.5px); }
+  75% { transform: translateX(0.5px); }
+}
+
+.needle-tremble {
+  animation: needle-tremble 0.1s ease-in-out infinite;
+}
+
+/* Loading bar */
+@keyframes loading-bar {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.loading-bar {
+  animation: loading-bar 2s ease-in-out;
+}
+
+/* Fade in */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Slide in from right */
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
