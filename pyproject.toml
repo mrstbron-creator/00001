@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "guitarkor"
+version = "0.1.0"
+description = "Гитар КОР — офлайн-распознавание аккордов и анализ гитары (rock-styled desktop app)"
+readme = "README.md"
+requires-python = ">=3.11"
+# Лицензия: см. LICENSE (GPL-3.0-or-later) и раздел 3 мастер-промпта.
+license = { text = "GPL-3.0-or-later" }
+authors = [{ name = "М. Корягин" }]
+
+# Ядро (обязательное): работает полностью офлайн, только CPU.
+dependencies = [
+    "numpy>=1.26,<2.4",
+    "scipy>=1.11",
+    "soundfile>=0.12",
+    "librosa>=0.10",
+    "PySide6>=6.6",
+    "mido>=1.3",
+]
+
+[project.optional-dependencies]
+# Опциональные компоненты; каждый со своими лицензионными оговорками
+# (см. THIRD_PARTY_LICENSES.md). Ставятся по желанию пользователя.
+onnx = ["onnxruntime>=1.16"]          # фаза 3; mutually exclusive с -gpu/-directml
+onnx-directml = ["onnxruntime-directml>=1.16"]  # VERIFY статус DirectML у Microsoft
+audio-live = ["sounddevice>=0.4"]     # WASAPI/MME; ASIO требует сборки PortAudio (VERIFY)
+essentia = ["essentia"]               # AGPL-3.0 — включать только в GPL-сборку (VERIFY wheels)
+madmom = ["madmom"]                  # CC BY-NC-SA веса: внеCommercial, выкл. по умолчанию
+dev = ["pytest>=7.4", "pytest-qt>=4.2", "mir_eval>=0.7", "ruff>=0.4"]
+
+[project.scripts]
+guitarkor = "main:main"
+
+[tool.setuptools]
+py-modules = ["main"]
+packages = ["core", "audio", "ui", "ui.theme", "ui.widgets", "export", "models", "tools"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
